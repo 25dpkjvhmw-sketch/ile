@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maze Runner</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 30px;
+            max-width: 900px;
+            width: 100%;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .stat {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .game-area {
+            display: flex;
+            justify-content: center;
+            margin: 30px 0;
+        }
+
+        canvas {
+            border: 3px solid #667eea;
+            border-radius: 10px;
+            background: #f5f5f5;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.2);
+            display: block;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 12px 30px;
+            font-size: 1em;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background: #e0e0e0;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #d0d0d0;
+        }
+
+        .instructions {
+            background: #f0f4ff;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .instructions h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .instructions p {
+            color: #555;
+            margin: 8px 0;
+            line-height: 1.6;
+        }
+
+        .key {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            margin: 0 4px;
+            font-weight: bold;
+            font-family: monospace;
+        }
+
+        .message {
+            text-align: center;
+            font-size: 1.2em;
+            font-weight: bold;
+            margin: 20px 0;
+            min-height: 30px;
+        }
+
+        .message.success {
+            color: #4caf50;
+        }
+
+        .message.info {
+            color: #2196f3;
+        }
+
+        .difficulty-selector {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .difficulty-btn {
+            padding: 8px 16px;
+            border: 2px solid #ddd;
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .difficulty-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .difficulty-btn:hover {
+            border-color: #667eea;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 1.8em;
+            }
+
+            canvas {
+                max-width: 100%;
+            }
+
+            .stats {
+                gap: 15px;
+            }
+
+            .stat-value {
+                font-size: 1.4em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎮 MAZE RUNNER</h1>
+            <p style="color: #666; margin-bottom: 20px;">Escape the maze to victory!</p>
+            
+            <div class="difficulty-selector">
+                <button class="difficulty-btn active" data-difficulty="easy">Easy</button>
+                <button class="difficulty-btn" data-difficulty="medium">Medium</button>
+                <button class="difficulty-btn" data-difficulty="hard">Hard</button>
+            </div>
+
+            <div class="stats">
+                <div class="stat">
+                    <div class="stat-label">Time</div>
+                    <div class="stat-value" id="timer">0:00</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-label">Moves</div>
+                    <div class="stat-value" id="moves">0</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-label">Best Time</div>
+                    <div class="stat-value" id="bestTime">--:--</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="message" id="message"></div>
+
+        <div class="game-area">
+            <canvas id="gameCanvas" width="600" height="600"></canvas>
+        </div>
+
+        <div class="controls">
+            <button class="btn-primary" onclick="startNewGame()">🔄 New Game</button>
+            <button class="btn-secondary" onclick="togglePause()" id="pauseBtn">⏸ Pause</button>
+            <button class="btn-secondary" onclick="toggleHint()" id="hintBtn">💡 Hint</button>
+        </div>
+
+        <div class="instructions">
+            <h3>How to Play</h3>
+            <p>🎯 <strong>Goal:</strong> Guide your player (blue square) through the maze and reach the exit (green square)!</p>
+            <p>⌨️ <strong>Controls:</strong> Use <span class="key">↑</span> <span class="key">↓</span> <span class="key">←</span> <span class="key">→</span> or <span class="key">W</span> <span class="key">A</span> <span class="key">S</span> <span class="key">D</span> to move</p>
+            <p>💨 <strong>Tips:</strong> Avoid hitting walls, track your best time, and use hints if you get stuck!</p>
+        </div>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>
